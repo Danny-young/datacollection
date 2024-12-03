@@ -1,5 +1,7 @@
 import express, { json,urlencoded } from 'express';
-//import productRoutes from './routes/products/index';
+import agentRoutes from './routes/agents/index';
+import datacollectionRoutes from './routes/collectedData/index';
+
 const port = 3000
 const app = express();
 
@@ -11,7 +13,8 @@ app.get('/', (req, res) => {
 })
 
 
-//app.use('/products', productRoutes);
+app.use('/agents', agentRoutes);
+app.use('/collectedData', datacollectionRoutes);
 app.listen(port,() => {
     console.log(`Server running on port ${port}`);
 });
