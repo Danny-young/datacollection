@@ -1,7 +1,7 @@
 import { Tabs } from 'expo-router';
 import React from 'react';
 import { Platform } from 'react-native';
-import Ionicons from '@expo/vector-icons/Ionicons'
+import Ionicons from '@expo/vector-icons/Ionicons';
 
 
 import { Colors } from '@/constants/Colors';
@@ -31,6 +31,18 @@ export default function TabLayout() {
           tabBarIcon: ({ color, focused }) => <Ionicons name={ focused ? 'home' : 'home-outline'} size={28}color={color} />,
         }}
       />
+      <Tabs.Screen
+        name="add"
+        options={{
+          title: 'add',
+          tabBarIcon: ({ color, focused }) => <Ionicons name={focused? 'add-circle' :'add-circle-outline'} size={30} color={color} />,
+        }}/>
+      <Tabs.Screen
+        name="userprofile"
+        options={{
+          title: 'user',
+          tabBarIcon: ({ color, focused }) => <Ionicons name={focused? 'settings' :'settings-outline'} size={28} color={color} />,
+        }}/>
       </Tabs>
   );
 }
