@@ -3,18 +3,21 @@ import {Router} from 'express'
 
 import {
 getAgents,
-createAgent
+createAgent,
+updateAgent
 
 
 } from "./agentControllers"
 
-
+import { validateData } from "../../middlewares/validationMiddleware";
+import { createAgentSchema} from "../../db/agentSchema";
 
 const router = Router();
 
 
 router.get('/', getAgents);
-router.post('/',createAgent)
+router.post('/',validateData(createAgentSchema),createAgent)
+router.post('/',updateAgent)
 
 
 

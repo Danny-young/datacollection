@@ -1,7 +1,8 @@
 import { Request, Response } from "express";
 import {db} from '../../db/index';
-import { agentsTable } from '../../db/agentSchema';
-import { eq } from "drizzle-orm"
+import { agentsTable, createAgentSchema } from '../../db/agentSchema';
+import { eq } from "drizzle-orm";
+import _ from 'lodash';
 
 
 export const getAgents = async (req: Request, res: Response) => {
@@ -18,7 +19,8 @@ try {
 export async function createAgent(req: Request, res: Response){
     // console.log(req.body);
   try {
-  const [agent] =  await db.insert(agentsTable).values(req.body).returning();
+    const data = _.pick(req.body,Object.keys(createAgentSchema.shape));
+  const [agent] =  await db.insert(agentsTable).values(req.cleanBody).returning();
       res.status(201).json(agent);
       } catch (error) {
           // console.error(error);
@@ -26,4 +28,14 @@ export async function createAgent(req: Request, res: Response){
       
   }
   
-  }
+  };
+
+  export function updateAgent(req: Request, res: Response){
+    res.send('updateAgent');
+    try {
+
+    } catch (e) {
+     
+      res.status(500).send(e);
+    }
+}
