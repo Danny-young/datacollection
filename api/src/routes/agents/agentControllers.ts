@@ -19,7 +19,7 @@ try {
 export async function createAgent(req: Request, res: Response){
     // console.log(req.body);
   try {
-    const data = _.pick(req.body,Object.keys(createAgentSchema.shape));
+  const data = _.pick(req.body,Object.keys(createAgentSchema.shape));
   const [agent] =  await db.insert(agentsTable).values(req.cleanBody).returning();
       res.status(201).json(agent);
       } catch (error) {
@@ -30,6 +30,7 @@ export async function createAgent(req: Request, res: Response){
   
   };
 
+  
   export function updateAgent(req: Request, res: Response){
     res.send('updateAgent');
     try {

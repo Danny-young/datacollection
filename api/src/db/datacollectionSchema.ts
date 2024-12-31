@@ -7,7 +7,7 @@ import { electoralAreasTable } from "./electoralAreaSchema";
 
 export const collectDataTable = pgTable("collect_data", {
     id: integer().primaryKey().generatedAlwaysAsIdentity(), // Unique identifier for each data collection entry
-    agentId: integer("agent_id").notNull().references(() => agentsTable.id, { onDelete: 'cascade' }),
+    agentId: integer("agent_id").notNull().references(() => agentsTable.id, { onDelete: 'cascade' , onUpdate: 'cascade'}),
     phoneNumber: numeric("phone_number").notNull(), // Phone number for the data record
     firstName: varchar("first_name", { length: 50 }).notNull(), // First name of the person
     lastName: varchar("last_name", { length: 50 }).notNull(), // Last name of the person
