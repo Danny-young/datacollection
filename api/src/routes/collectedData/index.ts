@@ -5,7 +5,7 @@ import {
     getDataEntryById, 
     updateDataEntry,
     deleteDataEntry 
- } from './dataControllers';
+ } from './dataControllers.js';
 
 const router =  Router();
 

@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import {db} from '../../db/index';
-import { collectDataTable } from "../../db/datacollectionSchema";
+import {db} from '../../db/index.js';
+import { collectDataTable } from "../../db/datacollectionSchema.js";
 import { eq } from "drizzle-orm";
 import _ from 'lodash';
 

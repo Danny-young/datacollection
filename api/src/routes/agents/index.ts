@@ -5,10 +5,10 @@ import {
 getAgents,
 createAgent,
 updateAgent
-} from "./agentControllers"
+} from "./agentControllers.js"
 
-import { validateData } from "../../middlewares/validationMiddleware";
-import { createAgentSchema } from "../../db/agentSchema";
+import { validateData } from "../../middlewares/validationMiddleware.js";
+import { createAgentSchema } from "../../db/agentSchema.js";
 
 
 const router = Router();

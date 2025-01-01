@@ -1,5 +1,5 @@
 import { pgTable, uuid, numeric, text, integer, timestamp, foreignKey, varchar } from "drizzle-orm/pg-core";
-import { agentsTable } from "./agentSchema";
+import { agentsTable } from "./agentSchema.js";
 
 // Geolocation Table
 export const geolocationTable = pgTable("geolocation", {

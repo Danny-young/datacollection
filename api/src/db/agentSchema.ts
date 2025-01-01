@@ -36,7 +36,6 @@ export const agentsTable = pgTable("agents", {
 
   export const loginSchema = createInsertSchema(agentsTable).pick({
     username: true,
-    password: true,
-   
+    password: true,  
         
   });

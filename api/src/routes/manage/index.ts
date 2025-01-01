@@ -1,10 +1,10 @@
 import e, { Router } from 'express';
-import { createAgentSchema, agentsTable, loginSchema } from '../../db/agentSchema';
-import { validateData } from '../../middlewares/validationMiddleware';
+import { createAgentSchema, agentsTable, loginSchema } from '../../db/agentSchema.js';
+import { validateData } from '../../middlewares/validationMiddleware.js';
 import bcrypt from 'bcryptjs';
 import { v4 as uuidv4 } from 'uuid';
-import { db } from '../../db';
-import { eq,sql,or } from 'drizzle-orm';
+import { db } from '../../db/index.js';
+import { eq,or } from 'drizzle-orm';
 
 const router =  Router();
 

@@ -1,7 +1,7 @@
 import express, { json,urlencoded } from 'express';
-import agentRoutes from './routes/agents/index';
-import manageRoutes from './routes/manage/index';
-import datacollectionRoutes from './routes/collectedData/index';
+import agentRoutes from './routes/agents/index.js';
+import manageRoutes from './routes/manage/index.js';
+import datacollectionRoutes from './routes/collectedData/index.js';
 
 const port = 3500
 const app = express();
