@@ -1,7 +1,7 @@
 import React from 'react'
 import {  Text, View } from 'react-native'
-import Login from '@/components/login'
-import Register from '@/components/register'
+import Login from '@/app/(auth)/login'
+import Register from '@/app/(auth)/register'
 import { Button, ButtonText } from '@/components/ui/button'
 
 export default function userprofile() {

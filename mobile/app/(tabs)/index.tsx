@@ -1,12 +1,18 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Text, View } from 'react-native'
 import { BarChart, PieChart } from "react-native-gifted-charts";
+import { listAgents } from "@/api/agents"
 
 
 
 
 export default function HomeScreen() {
 
+
+  useEffect(() => {
+    listAgents();
+  }
+  , []);
 
    const barData = [
     {value: 250, label: 'M'},
