@@ -16,11 +16,11 @@ router.post('/register', validateData(createAgentSchema), async(req, res) => {
             .select()
             .from(agentsTable)
             .where(
-                or(eq(agentsTable.email, email), eq(agentsTable.phoneNumber, phoneNumber))
+                or(eq(agentsTable.email, email), eq(agentsTable.phone_number, phoneNumber))
             );
 
         if (user) {
-            if (user.phoneNumber === phoneNumber) {
+            if (user.phone_number === phoneNumber) {
                 res.status(401).json({error: 'This number is already in use'});
                 return;
             } 
@@ -43,21 +43,24 @@ router.post('/register', validateData(createAgentSchema), async(req, res) => {
         const [newAgent] = await db.insert(agentsTable).values({
             name: data.name,
             email: data.email,
-            phoneNumber: data.phoneNumber,
+            phone_number: data.phone_number,
             password: hashedPassword,
-            username: 'TEMP' // Add temporary username during insert
+            user_name: 'TEMP' // Add temporary username during insert
         }).returning({ id: agentsTable.id });
 
-        const username = `AG${String(newAgent.id).padStart(3, "0")}`;
+        const user_name = `AG${String(newAgent.id).padStart(3, "0")}`;
         
         // Update the agent with the generated username
         await db.update(agentsTable)
-            .set({ username })
+            .set({ user_name })
             .where(eq(agentsTable.id, newAgent.id));
             
         // Send the temporary password to the agent
+        // {"AgentCode": "AG020", "temporaryPassword": "f68901db"}
+        // {"AgentCode": "AG021", "temporaryPassword": "126f312d"}
         res.status(200).json({
             message: "Agent successfully created",
+            AgentCode: user_name,
             temporaryPassword: password
         });
         return;
@@ -76,7 +79,7 @@ router.post('/login',validateData(loginSchema), async(req, res) => {
     try {
         const {username, password } = req.cleanBody;
 
-        const [user] = await db.select().from(agentsTable).where(eq(agentsTable.username,username));
+        const [user] = await db.select().from(agentsTable).where(eq(agentsTable.user_name,username));
 
         if(!user) {
             res.status(401).json({error: 'Authentication failed'});

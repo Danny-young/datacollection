@@ -4,7 +4,9 @@ import {Router} from 'express'
 import {
 getAgents,
 createAgent,
-updateAgent
+updateAgent,
+deleteAgent,
+getAgentById
 } from "./agentControllers.js"
 
 import { validateData } from "../../middlewares/validationMiddleware.js";
@@ -16,7 +18,9 @@ const router = Router();
 
 router.get('/', getAgents);
 router.post('/', validateData(createAgentSchema), createAgent)
-router.post('/', updateAgent)
+router.put('/:id', updateAgent)
+router.get('/:id', getAgentById)
+router.delete('/:id', deleteAgent)
 
 
 

@@ -1,3 +1,3 @@
-import * as agentSchema from './agentSchema.js';
+import * as agentSchema from './agentSchema';
 
 export default { ...agentSchema};

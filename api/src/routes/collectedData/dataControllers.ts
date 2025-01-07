@@ -33,8 +33,8 @@ export const getCollections = async (req: Request, res: Response) => {
    
     export  async function getDataEntryById(req: Request, res: Response){
         try {
-         const id = Number(req.params.id);
-          const [dataEntry] = await db.select().from(collectDataTable).where(eq(collectDataTable.agentId, id));      
+         const id = req.params.id;
+          const [dataEntry] = await db.select().from(collectDataTable).where(eq(collectDataTable.agent_id, id));      
           
           if (!dataEntry) {
             res.status(404).json({ error: 'Data entry id not found' });
