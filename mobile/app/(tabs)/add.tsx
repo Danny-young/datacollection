@@ -1,4 +1,4 @@
-import { Image, StyleSheet, Platform, View, ScrollView } from 'react-native';
+import { Image, StyleSheet, Platform, View, ScrollView, TouchableOpacity } from 'react-native';
 import React, { useRef, useState } from 'react';
 import {
   Button,
@@ -9,8 +9,6 @@ import {
 } from "@/components/ui/button"
 import {
   Card,
-
-
 } from "@/components/ui/card";
 import { Text } from '@/components/ui/text';
 import { Box } from '@/components/ui/box';
@@ -44,8 +42,12 @@ import {  Select,
   SelectDragIndicator,
   SelectItem,} from '@/components/ui/select';
   import { useQuery } from '@tanstack/react-query';
+import * as Location from 'expo-location';
+//import { MapPin } from 'lucide-react-native';
+import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
+import { Alert,  AlertIcon, AlertText } from '@/components/ui/alert';
 
-  
+
 
 
 export default function add() {
@@ -64,12 +66,16 @@ export default function add() {
     geolocation: '',
     valuationNo: '',
     dataType: '',
-    dataParticular: 'business'
+    dataParticular: 'business',
+    accuracy: null as number | null,
+    latitude: null as number | null,
+    longitude: null as number | null
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitAttempted, setSubmitAttempted] = useState(false);
-
+  const [isLocating, setIsLocating] = useState(false);
+  const [locationError, setLocationError] = useState<string | null>(null);
 
    // Reference for the Select Bottom Sheet
    const selectRef = useRef<any>(null);
@@ -132,6 +138,13 @@ export default function add() {
     };
   
 console.log(municipalities);
+
+  const requestLocationPermission = async () => {
+    const { status } = await Location.requestForegroundPermissionsAsync();
+    return status === 'granted';
+  };
+
+  const withinRange = formData.accuracy !== null && formData.accuracy <= 4;
 
   return (
     
@@ -298,9 +311,7 @@ console.log(municipalities);
         </FormControlLabel>
         <Select
   selectedValue={formData.electoralArea}
-  onValueChange={(value) =>
-    setFormData((prev) => ({ ...prev, electoralArea: value }))
-  }
+  onValueChange={handleElectoralAreaChange}
 >
           <SelectTrigger>
             <SelectInput placeholder="Select Electoral Area" />
@@ -352,12 +363,206 @@ console.log(municipalities);
         </SelectPortal>
       </Select>
         
+      <VStack className="space-y-2">
+  <FormControlLabel>
+    <FormControlLabelText>Geolocation*</FormControlLabelText>
+  </FormControlLabel>
+
+  <HStack className="items-center space-x-2">
+    <Button
+      variant="outline"
+      size="sm"
+      isDisabled={isLocating}
+      onPress={async () => {
+        try {
+          setIsLocating(true);
+          setLocationError(null);
+
+          const hasPermission = await requestLocationPermission();
+          if (!hasPermission) {
+            setLocationError('Location permission denied');
+            return;
+          }
+
+          const locationSubscription = await Location.watchPositionAsync(
+            {
+              accuracy: Location.Accuracy.High,
+              timeInterval: 1000,
+              distanceInterval: 1,
+            },
+            (location) => {
+              setFormData((prev) => ({
+                ...prev,
+                latitude: location.coords.latitude,
+                longitude: location.coords.longitude,
+                accuracy: location.coords.accuracy,
+                geolocation: `${location.coords.latitude}, ${location.coords.longitude}`,
+              }));
+
+              if (location.coords.accuracy <= 4) {
+                locationSubscription.remove();
+                setIsLocating(false);
+              }
+            }
+          );
+        } catch (error) {
+          setLocationError('Unable to get location');
+          console.error(error);
+        }
+      }}
+    >
+      <FontAwesome5 name="map-marker-alt" size={24} color={isLocating ? "blue" : "black"} />
+      <ButtonText>{isLocating ? 'Getting location...' : 'Get Location'}</ButtonText>
+    </Button>
+
+    <Input
+      className="flex-1"
+      isDisabled
+      size="md"
+    >
+      <InputField
+        value={formData.geolocation}
+        placeholder="Tap button to get location"
+      />
+    </Input>
+  </HStack>
+
+  {locationError && (
+    <Text className="text-red-500">{locationError}</Text>
+  )}
+
+  {formData.accuracy && (
+    <Text
+      className={formData.accuracy <= 4 ? "text-green-600" : "text-red-600"}
+    >
+      Accuracy: {formData.accuracy.toFixed(2)}m
+    </Text>
+  )}
+</VStack>
+<HStack className="items-center space-x-2 gap-2">
+<VStack className="space-y-2 flex-1">
+  <FormControlLabel>
+    <FormControlLabelText>Street Name*</FormControlLabelText>
+  </FormControlLabel>
+  <Input className=""
+         size="xl"
+         isInvalid={!!(submitAttempted && errors.streetName)}
+         >
+         <InputField
+           value={formData.streetName}
+           onChangeText={(text) => setFormData(prev => ({...prev, streetName: text}))}
+          />
+        </Input> 
+</VStack>
+<VStack className="space-y-2">
+  <FormControlLabel>
+    <FormControlLabelText>Valuation Number*</FormControlLabelText>
+  </FormControlLabel>
+  <Input className=""
+         size="xl"
+         isInvalid={!!(submitAttempted && errors.valuationNo)}
+         >
+         <InputField
+           value={formData.valuationNo}
+           onChangeText={(text) => setFormData(prev => ({...prev, valuationNo: text}))}
+          />
+        </Input> 
+</VStack>
+</HStack> 
 </Card>
+
+<Card size="sm" variant="filled" className="">
+  <Heading size="md" className="">
+    Data Information
+  </Heading> 
+<HStack className='space-x-2 gap-2'>
+  <VStack className="space-y-2 flex-1">
+  <FormControlLabel>
+    <FormControlLabelText>Data Type*</FormControlLabelText>
+  </FormControlLabel>
+  <Select
+    selectedValue={formData.dataType}
+    onValueChange={(value) =>
+      setFormData((prev) => ({
+        ...prev,
+        dataType: value,
+        dataParticular: value === 'business' ? 'business' : '',
+      }))
+    }
+  >
+    <SelectTrigger>
+      <SelectInput placeholder="Select data type" />
+      <SelectIcon as={ChevronDownIcon} />
+    </SelectTrigger>
+    <SelectPortal>
+      <SelectBackdrop />
+      <SelectContent>
+        <SelectItem label="Property" value="property" />
+        <SelectItem label="Business" value="business" />
+      </SelectContent>
+    </SelectPortal>
+  </Select>
+</VStack>
+
+<VStack className="space-y-2 flex-1">
+  <FormControlLabel>
+    <FormControlLabelText>Data Particular</FormControlLabelText>
+  </FormControlLabel>
+  {formData.dataType === 'property' ? (
+    <Select
+      selectedValue={formData.dataParticular}
+      onValueChange={(value) =>
+        setFormData((prev) => ({ ...prev, dataParticular: value }))
+      }
+    >
+      <SelectTrigger>
+        <SelectInput placeholder="Select property type" />
+        <SelectIcon as={ChevronDownIcon} />
+      </SelectTrigger>
+      <SelectPortal>
+        <SelectBackdrop />
+        <SelectContent>
+          <SelectItem label="Residential" value="residential" />
+          <SelectItem label="Commercial" value="commercial" />
+          <SelectItem label="Mixed Use" value="mixed" />
+        </SelectContent>
+      </SelectPortal>
+    </Select>
+  ) : (
+    <Input isDisabled>
+      <InputField value="business" />
+    </Input>
+  )}
+</VStack>
+</HStack>
+
+
+  </Card>
+
+  {/* <Alert action="error" className="gap-3">
+  
+    <AlertText className="text-typography-900" size="sm">
+    <Text className="mr-2 font-semibold text-typography-900">Heads up:</Text>
+     Once done, this action cannot be undone
+  </AlertText>
+</Alert> */}
+
+<VStack className="space-y-4">
+  <TouchableOpacity
+    className="w-full"
+    onPress={() => {
+      setSubmitAttempted(true);
+    }}
+    disabled={!withinRange}
+  >
+    <Text>{withinRange ? 'Save' : 'Get Location Within 4m Range To Save'}</Text>
+  </TouchableOpacity>
+</VStack>
+
 
 </View>    
    </FormControl>
-   </ScrollView>
-    
+   </ScrollView> 
       
   )
 }
