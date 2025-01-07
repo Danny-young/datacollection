@@ -8,33 +8,41 @@ import { Button, ButtonText } from '../../components/ui/button'
 import { AlertCircleIcon, EyeIcon, EyeOffIcon } from '../../components/ui/icon'
 import { useMutation } from '@tanstack/react-query';
 import { login } from '@/api/auth'
+import { useAuth } from '@/store/authStore'
+import { Redirect } from 'expo-router'
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   
-  
+  // const setUser = useAuth((s)=> s.setUser())
+  // const isLoggedIn = useAuth((s) => !!s.username)
+
   const handleState = () => {
     setShowPassword((showState) => {
     return !showState;
   });
     };
 
-  const loginMutation = useMutation({
-    mutationFn: () => login(username , password),
-    onSuccess: (data) => {
-      console.log('Success: ', data);
-    },
-    onError: () => {
-      console.log('Error');
-    }
-  });
-
+    const loginMutation = useMutation({
+      mutationFn: () => login(username , password),
+      onSuccess: (data) => {
+        console.log('Success: ', data);
+        if(data.username) {
+          //setUser(data.username);
+        }
+      },
+      onError: () => {
+        console.log('Error');
+      }
+    });
   
-
-
-  return (
+    // if(isLoggedIn) {
+    //   return <Redirect href={'/(tabs)'} />
+    // }
+  
+    return (
     
     <VStack className="w-full max-w-[300px] rounded-md border border-background-200 p-4">
       <FormControl
