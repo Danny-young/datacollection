@@ -1,10 +1,10 @@
 import express, { json,urlencoded } from 'express';
-import agentRoutes from './routes/agents/';
-import manageRoutes from './routes/manage';
-import electoralAreasRoutes from './routes/electoralArea';
-import localitiesRoutes from './routes/localities/';
-import datacollectionRoutes from './routes/collectedData';
-import geolocationRoutes from './routes/geoLocations';
+import agentRoutes from './routes/agents/index.js';
+import manageRoutes from './routes/manage/index.js';
+import electoralAreasRoutes from './routes/electoralArea/index.js';
+import localitiesRoutes from './routes/localities/index.js';
+import datacollectionRoutes from './routes/collectedData/index.js';
+import geolocationRoutes from './routes/geoLocations/index.js';
 import serverless from "serverless-http";
 
 const port = 3500

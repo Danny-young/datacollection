@@ -1,5 +1,5 @@
 import { pgTable, varchar, integer } from "drizzle-orm/pg-core";
-import { electoralAreasTable } from "./electoralAreaSchema";
+import { electoralAreasTable } from "./electoralAreaSchema.js";
 
 export const localitiesTable = pgTable("localities", {
     id: integer().primaryKey().generatedAlwaysAsIdentity(),

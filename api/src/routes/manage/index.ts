@@ -1,5 +1,5 @@
 import e, { Router } from 'express';
-import { createAgentSchema, agentsTable, loginSchema } from '../../db/agentSchema.js';
+import { createAgentSchema, agentsTable, loginSchema, changePasswordSchema } from '../../db/agentSchema.js';
 import { validateData } from '../../middlewares/validationMiddleware.js';
 import bcrypt from 'bcryptjs';
 import { v4 as uuidv4 } from 'uuid';
@@ -77,18 +77,18 @@ router.post('/register', validateData(createAgentSchema), async(req, res) => {
 router.post('/login',validateData(loginSchema), async(req, res) => {
 
     try {
-        const {username, password } = req.cleanBody;
+        const {user_name, password } = req.cleanBody;
 
-        const [user] = await db.select().from(agentsTable).where(eq(agentsTable.user_name,username));
+        const [user] = await db.select().from(agentsTable).where(eq(agentsTable.user_name,user_name));
 
         if(!user) {
-            res.status(401).json({error: 'Authentication failed'});
+            res.status(401).json({error: "Authentication failed"});
             return;
         }
 
         const match = await bcrypt.compare(password,user.password);
         if(!match) {
-            res.status(401).json({error: 'Authentication failed'});
+            res.status(401).json({error: "Authentication failed"});
             return;
         }
 
@@ -102,7 +102,14 @@ router.post('/login',validateData(loginSchema), async(req, res) => {
         // delete user.password;
         // res.status(200).json({token, user});
 
-        res.status(200).json({message: "Success!"});
+        res.status(200).json({
+            message: "Success!",
+            user: {
+                user_name: user.user_name,
+                first_login: user.first_login,
+                // other user data...
+            }
+        });
     } catch (error) {
         res.status(500).send(error);
         console.log(error);
@@ -112,6 +119,40 @@ router.post('/login',validateData(loginSchema), async(req, res) => {
 
 
 
+router.post('/change-password',validateData(changePasswordSchema),async(req, res) => { // Middleware for validating input
+    try {
+        // Validate request data
+        const { user_name, oldPassword, newPassword } = changePasswordSchema.parse(req.body);
+    
+        // Check if the user exists
+        const [user] = await db.select().from(agentsTable).where(eq(agentsTable.user_name, user_name));
+        if (!user) {
+            res.status(404).json({ error: 'User not found' });
+            return;
+        }
+    
+        // Verify old password
+        const isOldPasswordValid = await bcrypt.compare(oldPassword, user.password);
+        if (!isOldPasswordValid) {
+          res.status(401).json({ error: 'Old password is incorrect' });
+          return;
+        }
+    
+        // Hash and save the new password
+        const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+        await db.update(agentsTable).set({ password: hashedNewPassword, first_login: false  }).where(eq(agentsTable.user_name, user_name));
+    
+        res.status(200).json({ message: 'Password changed successfully' });
 
+     
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({error: "Internal server error"});
+        return;
+    }
+    });
+    
+
+  
 
 export default router;

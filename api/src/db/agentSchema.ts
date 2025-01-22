@@ -1,5 +1,6 @@
 import { integer, pgTable, varchar, boolean, timestamp  } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
+import { z } from 'zod';
 
 
 
@@ -40,3 +41,24 @@ export const agentsTable = pgTable("agents", {
     password: true,  
         
   });
+  
+  export const changePasswordSchema = z.object({
+    user_name: z
+      .string()
+      .min(3, 'Username must be at least 3 characters long')
+      .max(50, 'Username must not exceed 50 characters'), // Required for identifying the user
+    oldPassword: z
+      .string()
+      .min(8, 'Old password must be at least 8 characters long'), // Current password for verification
+    newPassword: z
+      .string()
+      .min(8, 'New password must be at least 8 characters long')
+      .regex(/[A-Z]/, 'New password must contain at least one uppercase letter')
+      .regex(/[a-z]/, 'New password must contain at least one lowercase letter')
+      .regex(/[0-9]/, 'New password must contain at least one number')
+      .regex(
+        /[@$!%*?&]/,
+        'New password must contain at least one special character (@, $, !, %, *, ?, &)'
+      ),
+  });
+  

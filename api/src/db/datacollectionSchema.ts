@@ -1,8 +1,7 @@
 import { pgTable, uuid, numeric,varchar, text, integer, timestamp, foreignKey } from "drizzle-orm/pg-core";
-import { agentsTable } from "./agentSchema";
-import { geolocationTable } from "./geolocations";
-import { localitiesTable } from "./localitySchema";
-import { electoralAreasTable } from "./electoralAreaSchema";
+import { agentsTable } from "./agentSchema.js";
+import { geolocationTable } from "./geolocations.js";
+
 
 
 export const collectDataTable = pgTable("collections", {
